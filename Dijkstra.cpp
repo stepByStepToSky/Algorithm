@@ -30,7 +30,6 @@ public:
 	{
 		// weight, v
 		priority_queue<pair<int, int>, vector<pair<int, int>>, Cmp> que;
-		vector<bool> visited(m_v, false);
 		vector<int> dist(m_v, INT_MAX);
 		dist[src] = 0;
 
@@ -40,15 +39,16 @@ public:
 			pair<int, int> top = que.top();
 			que.pop();
 			int from = top.second;
-			if (visited[from])
+
+			// ignore the old value
+			if (dist[from] < top.first)
 			{
 				continue;
 			}
 
-			visited[from] = true;
 			for (int to = 0; to < m_v; ++to)
 			{
-				if (!visited[to] && 0 != m_vec[from][to] && dist[from] + m_vec[from][to] < dist[to])
+				if (0 != m_vec[from][to] && dist[from] + m_vec[from][to] < dist[to])
 				{
 					dist[to] = dist[from] + m_vec[from][to];
 					que.push(make_pair(dist[to], to));
