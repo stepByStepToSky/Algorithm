@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -31,6 +32,36 @@ void QuickSort(vector<int> & vec, int low, int high)
 	}
 }
 
+
+void QuickSortIterator(vector<int> & vec, int low, int high)
+{
+	if (low < high)
+	{
+		stack<int> sta;
+		sta.push(low);
+		sta.push(high);
+
+		while (!sta.empty())
+		{
+			int right = sta.top();
+			sta.pop();
+			int left = sta.top();
+			sta.pop();
+			int mid = Partition(vec, left, right);
+			if (left < mid - 1)
+			{
+				sta.push(left);
+				sta.push(mid - 1);
+			}
+			if (mid + 1 < right)
+			{
+				sta.push(mid + 1);
+				sta.push(high);
+			}
+		}
+	}
+}
+
 int main()
 {
 	vector<int> vec;
@@ -43,7 +74,8 @@ int main()
 		}
 	}
 
-	QuickSort(vec, 0, vec.size() - 1);
+	//QuickSort(vec, 0, vec.size() - 1);
+	QuickSortIterator(vec, 0, vec.size() - 1);
 
 	for (int item : vec)
 	{
