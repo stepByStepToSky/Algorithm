@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <queue>
+#include <memory>
 #include <string.h>
 
 using namespace std;
@@ -10,6 +11,10 @@ using namespace std;
 class AcAutoMachine
 {
 public:
+	AcAutoMachine() : m_buffer(nullptr), m_size(0), m_capacity(0)
+	{
+	}
+
 	struct AcNode
 	{
 		AcNode(char value) : fail(nullptr), val(value), len(0)
@@ -19,8 +24,8 @@ public:
 
 		AcNode * next[256];
 		AcNode * fail;
-		char val;
 		int len;
+		char val;
 
 		bool isWord()
 		{
@@ -42,11 +47,29 @@ public:
 
 	AcNode * GetAcNode(char val)
 	{
-		return new AcNode(val);
+		//return new AcNode(val);
+		char * p = m_buffer.get();
+		p += (m_size * sizeof(AcNode));
+		++m_size;
+		new (p) AcNode(val);
+		return (reinterpret_cast<AcNode*>(p));
+	}
+
+	void AllocMemory(const vector<string> & vec)
+	{
+		m_size = 0;
+		m_capacity = 5;
+		for (size_t i = 0; i < vec.size(); ++i)
+		{
+			m_capacity += vec[i].size();
+		}
+		
+		m_buffer.reset(static_cast<char *>(malloc(m_capacity * sizeof(AcNode))));
 	}
 
 	AcNode * BuildTrieTree(const vector<string> & vec)
 	{
+		AllocMemory(vec);
 		AcNode * root = GetAcNode(0);
 		for (size_t i = 0; i < vec.size(); ++i)
 		{
@@ -165,6 +188,11 @@ public:
 			}
 		}
 	}
+
+private:
+	unique_ptr<char> m_buffer;
+	int m_size;
+	int m_capacity;
 };
 
 int main()
